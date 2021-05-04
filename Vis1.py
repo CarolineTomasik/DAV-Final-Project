@@ -37,7 +37,11 @@ full_dose_df = vaccine_df.loc[(vaccine_df['Region'] == 'Sweden') & (vaccine_df['
 plt.bar(x='age group', height='number of vaccinated', data= one_dose_df)
 plt.bar(x='age group', height='number of vaccinated', data= full_dose_df)
 
-
+#sweden unemployment
+unemployment_df = pd.read_csv(os.getcwd() + '/DP_LIVE_20042021212852502.csv')
+swe_unemployment_df = unemployment_df.loc[(unemployment_df['LOCATION'] == 'SWE')]
+plt.plot('TIME','Value', data= swe_unemployment_df)
+plt.xticks(rotation=45)
 
 #age_df = pd.read_excel('Folkhalsomyndigheten_Covid19.xls', sheet_name='Totalt antal per åldersgrupp')
 #age_df = age_df.rename(columns ={'Åldersgrupp':'age group', 'Totalt_antal_fall':'cases per day','Totalt_antal_avlidna':'deaths per day'})
