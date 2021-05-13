@@ -32,10 +32,8 @@ def timestamp_to_x(X):
 cases_df = pd.read_excel('Folkhalsomyndigheten_Covid19.xls', sheet_name='Antal per dag region')
 cases_df = cases_df.rename(columns ={'Statistikdatum':'date', 'Totalt_antal_fall':'cases per day'})
 
-
 cases = cases_df.to_numpy()
 tot_cases = cases[:,1:].sum(axis=1)
-print(tot_cases.shape)
 
 cumul = []
 c = 0
@@ -53,10 +51,10 @@ plt.xticks(np.arange(45, 410, 30),
 plt.savefig('cumul.png')
 
 
-# fitting an exp function: y = a*np.exp((t+b)/c)
+# fitting an exp function of form: y = a*np.exp((t+b)/c)
 
 fit = curve_fit(lambda t,a,b,c: a*np.exp((t+b)/c),timestamp_to_x(cases[:,0]), cumul, p0=(6,140,46))
-print(fit[0])
+#print(fit[0])
 plt.figure(figsize=(8,6))
 plt.plot(timestamp_to_x(cases[:,0]),fit[0][0] * np.exp( (np.array(timestamp_to_x(cases[:,0]))+fit[0][1])/fit[0][2] ),'--k',alpha=0.3)
 plt.plot(timestamp_to_x(cases[:,0]), cumul)
@@ -99,4 +97,48 @@ plt.xticks(np.arange(45, 410, 30),
 plt.savefig('cumul_fit2.png')
 
 
-# 3. to do: Correlation of unemployment data with bimodal data: deaths or icu
+# 3. Correlation of unemployment data with bimodal data: deaths
+
+# unemployment data
+unemp = np.genfromtxt('DP_LIVE_20042021212852502.csv',dtype='str',delimiter=",")
+unemp = unemp[unemp[:,0]=='SWE'][5:,-2].astype(float)
+print(unemp)
+# deaths data
+deaths_df = pd.read_excel('Folkhalsomyndigheten_Covid19.xls', sheet_name='Antal avlidna per dag')
+deaths_df.columns = ['date', 'deaths per day']
+deaths_df.drop(deaths_df.tail(1).index,inplace = True)
+deaths = deaths_df.to_numpy()
+# monthly average
+deaths_m_avg = []
+months = list(range(3,13)) + [1,2,3]
+y = 2020
+for m in months:
+    l=[]
+    for i in range(0, deaths.shape[0]):
+        if int(deaths[i,0].strftime("%m"))==m and int(deaths[i,0].strftime("%Y"))==y:
+            l.append(deaths[i,1])
+    print(l)
+    deaths_m_avg.append(np.mean(l))
+    if m==12: y=2021
+
+#normalize etc.
+deaths_m_avg = np.array(deaths_m_avg)
+deaths_m_avg = deaths_m_avg/max(deaths_m_avg)
+deaths_m_avg = deaths_m_avg - min(deaths_m_avg)
+deaths_m_avg = deaths_m_avg/max(deaths_m_avg)
+unemp = np.array(unemp)
+unemp = unemp/max(unemp)
+unemp = unemp - min(unemp)
+unemp = unemp/max(unemp)
+
+q=np.corrcoef(deaths_m_avg[:-1],unemp)
+
+plt.figure()
+plt.plot(deaths_m_avg)
+plt.plot(unemp)
+plt.xticks([])
+plt.xlabel('time')
+plt.title('Deaths vs unemployment, corr = %.3f' % q[1,0])
+plt.savefig('corr.png')
+
+print(q)# very weak anti-correlation...
