@@ -4,28 +4,9 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
+from utils import *
 
-# utility functions to edit x-axis (time) easier
-def string_to_x(X):
-    #print('len x = ' + str(X.shape))
-    #print(X[:5])
-    XX=[]
-    for i in range(0, len(X)):
-        date = X[i]
-        date = date.split('-')
-        XX.append((12*31)*(int(date[0])-2020)+31*(int(date[1])-1)+int(date[2]))
-
-    return XX
-
-def timestamp_to_x(X):
-    #print('len x = ' + str(X.shape))
-    #print(X[:5])
-    XX=[]
-    for i in range(0, len(X)):
-        stamp = X[i]
-        XX.append((int(stamp.strftime("%Y")) - 2020 )*(12*30) + 30 * (int(stamp.strftime("%m")) - 1) + int(stamp.strftime("%d")))
-    return XX
-
+plt.rcParams.update({'font.size': 14.5})
 
 # 1. Cumulative cases
 
@@ -82,17 +63,22 @@ plt.savefig('cumul_fit1.png')
 fit1 = curve_fit(lambda t,a,b,c: a*np.exp((t+b)/c),timestamp_to_x(cases[:150,0]), cumul[:150], p0=(6,140,46))
 fit2 = curve_fit(lambda t,a,b,c: a*np.exp((t+b)/c),timestamp_to_x(cases[265:340,0]), cumul[265:340], p0=(6,140,46))
 
-plt.figure(figsize=(8,6))
+plt.figure(figsize=(8,5))
 plt.ylim([0, 1.75e6])
-plt.plot(timestamp_to_x(cases[:,0]),fit1[0][0] * np.exp( (np.array(timestamp_to_x(cases[:,0]))+fit1[0][1])/fit1[0][2] ),'--k',alpha=0.3)
-plt.plot(timestamp_to_x(cases[:,0]),fit2[0][0] * np.exp( (np.array(timestamp_to_x(cases[:,0]))+fit2[0][1])/fit2[0][2] ),'--k',alpha=0.3)
+lab = 'fit: $y =a \cdot exp(\\frac{x+b}{c}$)'
+plt.plot(timestamp_to_x(cases[:,0]),fit1[0][0] * np.exp( (np.array(timestamp_to_x(cases[:,0]))+fit1[0][1])/fit1[0][2] ),'k',linestyle='dotted',alpha=1,label=lab)
+plt.plot(timestamp_to_x(cases[:,0]),fit2[0][0] * np.exp( (np.array(timestamp_to_x(cases[:,0]))+fit2[0][1])/fit2[0][2] ),'k',linestyle='dotted',alpha=1)
 plt.plot(timestamp_to_x(cases[:,0]), cumul)
-plt.xlim([30, 430])
-plt.xlabel('date')
-plt.ylabel('cumulative cases')
-plt.xticks(np.arange(45, 410, 30),
-           ['Feb\n 20 ', 'Mar\n 20 ', 'Apr\n 20 ', 'May\n 20 ', 'Jun\n 20 ', 'Jul\n 20 ', 'Aug\n 20 ', 'Sep\n 20 ',
-            'Oct\n 20 ', 'Nov\n 20 ', 'Dec\n 20 ', 'Jan\n 21 ', 'Feb\n 21'], rotation=0)
+date_min, date_max = min(timestamp_to_x(cases[:, 0])), max(timestamp_to_x(cases[:, 0]))
+ticks, labels = x_to_ticks(date_min, date_max,sparse = 2)
+plt.xticks(ticks, labels)
+plt.legend(loc='upper left')
+plt.xlim(date_min,date_max)
+plt.ylim([0,1.4*1e6])
+plt.yticks(np.arange(0,1.6,0.2)*1e6, [t+'K' for t in np.arange(0,1600,200).astype(str)])
+#plt.xlabel('date')
+plt.ylabel('Cases, cumul. (in thousands)')
+
 
 plt.savefig('cumul_fit2.png')
 
