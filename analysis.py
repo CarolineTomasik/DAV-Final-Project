@@ -120,11 +120,13 @@ unemp = unemp/max(unemp)
 q=np.corrcoef(deaths_m_avg[:-1],unemp)
 
 plt.figure()
-plt.plot(deaths_m_avg)
-plt.plot(unemp)
-plt.xticks([])
+plt.plot(deaths_m_avg, label='deaths')
+plt.plot(unemp, label='unemployment')
+plt.legend()
+plt.xticks(np.arange(0,13,2),['Mar\n 20 ',  'May\n 20 ',  'Jul\n 20 ',  'Sep\n 20 ',
+                'Nov\n 20 ',  'Jan\n 21 ', 'Mar\n 21'])
 plt.xlabel('time')
-plt.title('Deaths vs unemployment, corr = %.3f' % q[1,0])
+plt.title('Deaths vs unemployment (norm.)')#, corr = %.3f' % q[1,0])
 plt.savefig('corr.png')
 
 print(q)# very weak anti-correlation...
