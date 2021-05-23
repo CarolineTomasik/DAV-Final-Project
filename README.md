@@ -4,7 +4,11 @@ This project examines the COVID-19 dynamics in Sweden including: the total numbe
 Data was gathered from the following sources:
 
 Swedish COVID-19: https://commons.wikimedia.org/wiki/Data:COVID-19_Sweden_daily_cases_hospitalisations_deaths.tab
+
 Swedish Vaccine Data: https://fohm.maps.arcgis.com/sharing/rest/content/items/fc749115877443d29c2a49ea9eca77e9/data
+
 Swedish Testing Data: https://covid19dataportal.se/data_types/health_data/npc-statistics/#
+
 Global COVID-19 Data: https://ourworldindata.org/coronavirus/country/sweden
+
 Unemployment Data: https://tradingeconomics.com/sweden/unemployment-rate
